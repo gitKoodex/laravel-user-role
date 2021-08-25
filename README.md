@@ -512,3 +512,9 @@ class CustomeAdminController extends Controller
 # TODO
 - change dashboard ui to [laravel word press admin panel](https://github.com/gitKoodex/larapress)
 -
+
+# thanks for code
+- [User Role based Authentication and Access Control in Laravel](https://5balloons.info/user-role-based-authentication-and-access-control-in-laravel/)
+- [A Practical Guide to Laravel Roles and Permissions
+](https://www.larashout.com/laravel-roles-and-permissions)
+
