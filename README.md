@@ -1,5 +1,5 @@
 # laravel-user-role
-this is simple laravel user role project you can use it for any laravel project. if you need user role. i don't use and extra library for this. so it is as simple as it can be.
+this is simple laravel user role project you can use it for any laravel project.this is for your project if you need user role in it and dont wana doit from scrach. i don't use and extra library for this. so it is as simple as it can be.
 
 # how to use
 - download this or clone it
@@ -18,4 +18,344 @@ $php artisan serve
 # you should know
 [laravel word press admin panel](https://github.com/gitKoodex/larapress) is my copy of [corcel](https://github.com/corcel/corcel) so you can use the orginal one.
 
+# how done it frome scrach
 
+```
+$ composer create-project laravel/laravel user-role --prifer-dist
+```
+
+```
+$ cd user-role
+```
+
+```
+$ php artisan make:controller AdminController
+
+```
+
+```
+$ php artisan make:controller SuperAdminController
+
+```
+
+- in your AdminController (yourproject)\app\Http\Controllers\AdminController add this line of code
+
+```
+    //Index method for Admin Controller
+    public function index()
+    {
+        return view('admin.home');
+    }
+```
+
+```
+    //Index method for SuperAdmin Controller
+    public function index()
+    {
+        return view('superadmin.home');
+    }
+```
+
+- code of admin.home view
+
+```
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Admin Dashboard</div>
+
+                <div class="panel-body">
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    This is Admin Dashboard. You must be privileged to be here !
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+```
+- Next, Create new folder superadmin under resources > views and add new file home.blade.php
+
+```
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Super Admin Dashboard</div>
+
+                <div class="panel-body">
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                        This is Admin Dashboard. You must be super privileged to be here !
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+```
+- Add route entry into routes / web.php file
+
+```
+Route::get('/admin', 'AdminController@index');
+
+Route::get('/superadmin', 'SuperAdminController@index')
+```
+- Create the Role model and setup migration
+
+```
+$ php artisan make:model Role -m
+
+```
+- This will create a Model class for the roles table and will also create a migrations file under database > migrations
+
+- Edit the CreateRolesTable class under migrations folder
+
+```
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateRolesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('roles', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('description');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('roles');
+    }
+}
+
+Create Migration for the role_user table
+We need another table , which hold’s that data of which role is assigned to which user.
+
+php artisan make:migration create_role_user_table
+Edit the CreateRoleUserTable class in the migrations folder:
+
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateRoleUserTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('role_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('role_user');
+    }
+}
+```
+- Next, we need to provide many-to-many relationship between User and Role
+- Add roles() method to your User.php class
+
+```
+    public function roles()
+    {
+        return $this
+            ->belongsToMany('App\Role')
+            ->withTimestamps();
+    }
+Add users() to your Role.php class
+
+    public function users()
+    {
+        return $this
+            ->belongsToMany('App\User')
+            ->withTimestamps();
+    }
+```
+    
+- Create tables and add data for testing
+- You can now run the migrate command to create the tables in database
+
+```
+$ php artisan migrate
+
+```
+ 
+- Running the migrate command creates following tables in your database. You can choose to fill the data for testing either manually or via Seeding.
+
+
+- I have created two Roles with name ROLE_ADMIN and ROLE_SUPERADMIN. Users assigned the role of ROLE_ADMIN should have access to Admin Section of Application. Same applies to super admin users.
+
+- You can register new user’s by going into /register url, after you have added few user’s you can assign roles to user in role_user table.
+
+
+- I have assigned some sample roles to the user.
+
+- Just a few more steps, Don’t give up !
+
+- Modify User.php 
+- Open user.php and add these tiny methods which will be used to check if user has a particular role or roles
+
+```
+public function authorizeRoles($roles)
+{
+  if ($this->hasAnyRole($roles)) {
+    return true;
+  }
+  abort(401, 'This action is unauthorized.');
+}
+public function hasAnyRole($roles)
+{
+  if (is_array($roles)) {
+    foreach ($roles as $role) {
+      if ($this->hasRole($role)) {
+        return true;
+      }
+    }
+  } else {
+    if ($this->hasRole($roles)) {
+      return true;
+    }
+  }
+  return false;
+}
+public function hasRole($role)
+{
+  if ($this->roles()->where(‘name’, $role)->first()) {
+    return true;
+  }
+  return false;
+}
+```
+
+- With the above methods, if you are looking to check just against a single role you can make use of hasRole method.
+
+- Or You can check against multiple roles by passing an array to authorizeRoles method.
+
+- Currently we are only looking to compare against a single role, We will make use of hasRole method. Let’s go ahead and create the Middleware for the same.
+
+- Create Middleware
+- We will create a new middleware CheckRole 
+
+```
+$ php artisan make:middleware CheckRole
+```
+
+- Modify the CheckRole.php file under app > Middleware
+
+
+```
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+
+class CheckRole
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next, $role)
+    {
+        if (! $request->user()->hasRole($role)) {
+            abort(401, 'This action is unauthorized.');
+        }
+        return $next($request);
+    }
+}
+```
+- We have modified the handle method middleware to check for given role.
+
+-Next step is to register the middleware we just created. Open Kernal.php which is located under App > and modify array $routeMiddleware to include the role middleware.
+
+ ```
+
+    protected $routeMiddleware = [
+        'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
+    ];
+ 
+```
+- Modify Controllers
+- Open AdminController.php. Below code in constructor method will check if the logged in user has role ROLE_ADMIN associated with it.
+
+```
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:ROLE_ADMIN');
+    }
+```
+
+- same for SuperAdminController.php
+
+```
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:ROLE_SUPERADMIN');
+    }
+```
+
+# TODO
+- add seeders
+-
