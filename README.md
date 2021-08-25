@@ -1,5 +1,5 @@
 # laravel-user-role
-this is simple laravel user role project you can use it for any laravel project.this is for your project if you need user role in it and dont wana doit from scrach. i don't use and extra library for this. so it is as simple as it can be.
+this is simple laravel user role project you can use it for any laravel project.this is for your project, if you need user role in it and don't wanna do it from scratch. i don't use and extra library for this. so it is as simple as it can be.
 
 # how to use
 - download this or clone it
@@ -162,13 +162,18 @@ class CreateRolesTable extends Migration
         Schema::dropIfExists('roles');
     }
 }
+```
 
-Create Migration for the role_user table
-We need another table , which hold’s that data of which role is assigned to which user.
+- Create Migration for the role_user table
+- We need another table , which hold’s that data of which role is assigned to which user.
 
-php artisan make:migration create_role_user_table
-Edit the CreateRoleUserTable class in the migrations folder:
+```
+$ php artisan make:migration create_role_user_table
+```
 
+- Edit the CreateRoleUserTable class in the migrations folder:
+
+```
 <?php
 
 use Illuminate\Support\Facades\Schema;
@@ -314,7 +319,7 @@ class CreateUsersSeeder extends Seeder
     }
 }
 ```
-- add this to DatabaseSeeder.php for call two before seeders
+- add this to DatabaseSeeder.php for call two Previous seeders
 
 ```
 <?php
