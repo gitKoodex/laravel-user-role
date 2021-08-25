@@ -25,6 +25,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\CustomeAdminController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -44,6 +45,8 @@ Route::get('/admin', [AdminController::class,'index']);
 
 Route::get('/superadmin', [SuperAdminController::class,'index']);
 
+Route::get('/custom-panel',[CustomeAdminController::class,'index']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,7 +61,10 @@ Route::get('/superadmin', [SuperAdminController::class,'index']);
 */
 Route::redirect('/', '/login');
 Route::get("/home",function (){
-   echo "<a href='/admin'>admin</a><br><a href='/superadmin'>superadmin</a><br><form method='post' action='/logout'><input type='hidden' name='_token' value='".csrf_token()."' /><input type='submit' value='/logout'></form>";
+   echo "<a href='/admin'>admin</a>
+         <br><a href='/superadmin'>superadmin</a>
+         <br/><a href='/custom-panel'>custome panel</a>
+         <br><form method='post' action='/logout'><input type='hidden' name='_token' value='".csrf_token()."' /><input type='submit' value='/logout'></form>";
 });
 
 

@@ -221,12 +221,103 @@ Add users() to your Role.php class
             ->withTimestamps();
     }
 ```
+
+
+# add seeder
+- for our data we create the seeder data
+
+```
+$ php artisan make:seeder CreateRolesSeeder
+
+```
+
+```
+$ php artisan make:seeder CreateUsersSeeder
+
+```
+
+- add this code to CreateRolesSeeder
+
+```
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Role;
+use App\Models\User;
+
+class CreateRolesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $role1 = new Role();
+        $role1->name = 'role_visitor';
+        $role1->description = "mahallo user";
+        $role1->save();
+
+
+        $role2 = new Role();
+        $role2->name = 'role_admin';
+        $role2->description = "mahallow desc";
+        $role2->save();
+    }
+}
+
+```
+
+- add this code to CreateUsersSeeder
+
+```
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Role;
+use App\Models\User;
+
+class CreateUsersSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $visitor = Role::Where('name','role_visitor')->first();
+        $admin = Role::Where('name','role_admin')->first();
+
+        $user1 = new User();
+        $user1->name = 'kodexadmin';
+        $user1->email = 'kodexadmin@example.com';
+        $user1->password = bcrypt('kodexMahallo@#15adM1n');
+        $user1->save();
+        $user1->roles()->attach($visitor);
+
+        $user2 = new User();
+        $user2->name = 'kodexadmin2';
+        $user2->email = 'kodexadmin2@example.com';
+        $user2->password = bcrypt('kodexMahallo@#15adM1n');
+        $user2->save();
+        $user2->roles()->attach($admin);
+    }
+}
+
+
+```
     
 - Create tables and add data for testing
 - You can now run the migrate command to create the tables in database
 
 ```
-$ php artisan migrate
+$ php artisan migrate --seed
 
 ```
  
@@ -357,5 +448,5 @@ class CheckRole
 ```
 
 # TODO
-- add seeders
+- change dashboard ui to [laravel word press admin panel](https://github.com/gitKoodex/larapress)
 -
