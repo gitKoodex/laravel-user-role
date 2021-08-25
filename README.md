@@ -12,3 +12,10 @@ $php artisan serve
 
 # based on
 - [laravel](https://github.com/laravel/laravel)
+- [laravel word press admin panel](https://github.com/gitKoodex/larapress)
+- [corcel](https://github.com/corcel/corcel)
+
+# you should know
+[laravel word press admin panel](https://github.com/gitKoodex/larapress) is my copy of [corcel](https://github.com/corcel/corcel) so you can use the orginal one.
+
+
