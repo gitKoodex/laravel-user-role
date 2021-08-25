@@ -1,2 +1,14 @@
 # laravel-user-role
 this is simple laravel user role project you can use it for any laravel project. if you need user role. i don't use and extra library for this. so it is as simple as it can be.
+
+# how to use
+- download this or clone it
+- open your favorit terminal
+- excute this lines
+
+```
+$php artisan serve
+```
+
+# based on
+- [laravel](https://github.com/laravel/laravel)
