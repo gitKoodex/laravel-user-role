@@ -18,10 +18,8 @@ class CustomeAdminController extends Controller
         $user = User::find(Auth::user()->id);
         if($this->middleware("role:$user->roles[0]->name")){
            echo ($user->roles[0]->name);
-           $view_folder = strval($user->roles[0]->name);
+           $view_folder ="dashboard.". strval($user->roles[0]->name);
             return view("$view_folder.home");
         }
-//        $this->middleware('role:role_visitor');
-//        return view('admin.home');
     }
 }

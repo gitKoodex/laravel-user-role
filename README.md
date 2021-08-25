@@ -16,7 +16,8 @@ $php artisan serve
 - [corcel](https://github.com/corcel/corcel)
 
 # you should know
-[laravel word press admin panel](https://github.com/gitKoodex/larapress) is my copy of [corcel](https://github.com/corcel/corcel) so you can use the orginal one.
+- [laravel word press admin panel](https://github.com/gitKoodex/larapress) is my copy of [corcel](https://github.com/corcel/corcel) so you can use the orginal one.
+- i use simple login form without any style you can use your favorite login form, you can find one in [laravel Starter Kits](https://laravel.com/docs/8.x/starter-kits) for laravel 8.*.
 
 # how done it frome scrach
 
@@ -38,6 +39,13 @@ $ php artisan make:controller SuperAdminController
 
 ```
 
+```
+$ php artisan make:controller CustomeAdminController
+
+```
+
+
+
 - in your AdminController (yourproject)\app\Http\Controllers\AdminController add this line of code
 
 ```
@@ -47,6 +55,7 @@ $ php artisan make:controller SuperAdminController
         return view('admin.home');
     }
 ```
+- in your SuperAdminController (yourproject)\app\Http\Controllers\SuperAdminController add this line of code
 
 ```
     //Index method for SuperAdmin Controller
@@ -59,9 +68,6 @@ $ php artisan make:controller SuperAdminController
 - code of admin.home view
 
 ```
-@extends('layouts.app')
-
-@section('content')
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -81,14 +87,10 @@ $ php artisan make:controller SuperAdminController
         </div>
     </div>
 </div>
-@endsection
 ```
 - Next, Create new folder superadmin under resources > views and add new file home.blade.php
 
 ```
-@extends('layouts.app')
-
-@section('content')
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -108,7 +110,6 @@ $ php artisan make:controller SuperAdminController
         </div>
     </div>
 </div>
-@endsection
 ```
 - Add route entry into routes / web.php file
 
@@ -212,8 +213,11 @@ class CreateRoleUserTable extends Migration
             ->belongsToMany('App\Role')
             ->withTimestamps();
     }
-Add users() to your Role.php class
+```
 
+- Add users() to your Role.php class
+
+```
     public function users()
     {
         return $this
@@ -309,9 +313,33 @@ class CreateUsersSeeder extends Seeder
         $user2->roles()->attach($admin);
     }
 }
-
+```
+- add this to DatabaseSeeder.php for call two before seeders
 
 ```
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        // \App\Models\User::factory(10)->create();
+        $this->call(CreateRolesSeeder::class);
+        $this->call(CreateUsersSeeder::class);
+    }
+}
+
+```
+
     
 - Create tables and add data for testing
 - You can now run the migrate command to create the tables in database
@@ -446,6 +474,40 @@ class CheckRole
         $this->middleware('role:ROLE_SUPERADMIN');
     }
 ```
+
+- for CustomeAdminController.php add this lins
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
+class CustomeAdminController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+    }
+    public function index()
+    {
+        $user = User::find(Auth::user()->id);
+        if($this->middleware("role:$user->roles[0]->name")){
+           echo ($user->roles[0]->name);
+           $view_folder ="dashboard.". strval($user->roles[0]->name);
+            return view("$view_folder.home");
+        }
+    }
+}
+
+```
+
+- create views in dashboard/role_visitor/home.blade.php same as admin.home
+- create views in dashboard/role_admin/home.blade.php same as admin.home
 
 # TODO
 - change dashboard ui to [laravel word press admin panel](https://github.com/gitKoodex/larapress)
